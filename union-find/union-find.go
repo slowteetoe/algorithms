@@ -1,8 +1,6 @@
 package main
 
-import (
-	"fmt"
-)
+import ()
 
 type UnionFinder interface {
 	Union(p, q int)
@@ -34,8 +32,4 @@ func (qf quickFind) Union(p, q int) {
 
 func (qf quickFind) Connected(p, q int) bool {
 	return qf.id[p] == qf.id[q]
-}
-
-func main() {
-	fmt.Println("Todo")
 }
