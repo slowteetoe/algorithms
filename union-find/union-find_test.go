@@ -4,8 +4,7 @@ import (
 	"testing"
 )
 
-// TODO think about return here - it's order dependent, so if we switch impl, does it fail?  Maybe switch to asserting via Connected()?
-func prepareTest(uf UnionFinder) []int {
+func setupUnionCalls(uf UnionFind) {
 	uf.Union(4, 3)
 	uf.Union(3, 8)
 	uf.Union(6, 5)
@@ -14,7 +13,6 @@ func prepareTest(uf UnionFinder) []int {
 	uf.Union(8, 9)
 	uf.Union(5, 0)
 	uf.Union(7, 2)
-	return []int{0, 1, 1, 8, 8, 0, 0, 1, 8, 8}
 }
 
 var expectedConnectedResults = []struct {
@@ -45,13 +43,39 @@ func TestOneStep(t *testing.T) {
 
 func TestQuickFind(t *testing.T) {
 	uf := NewQuickFind(10)
-	expected := prepareTest(uf)
-	assertEqual(t, uf.id, expected)
+	setupUnionCalls(uf)
+	for _, r := range expectedConnectedResults {
+		actual := uf.Connected(r.p, r.q)
+		if actual != r.expected {
+			t.Errorf("Expected Connected(%v, %v) to be %v, but was %v\n", r.p, r.q, r.expected, actual)
+		}
+	}
 }
 
-func TestQuickFindUsingTable(t *testing.T) {
-	uf := NewQuickFind(10)
-	prepareTest(uf)
+var rootResults = []struct {
+	p, expected int
+}{
+	{0, 2},
+	{1, 1},
+	{2, 2},
+	{3, 3},
+}
+
+func TestQuickUnionRootFunc(t *testing.T) {
+	uf := NewQuickUnion(4)
+	uf.id = []int{2, 1, 2, 3}
+
+	for _, r := range rootResults {
+		actual := uf.root(uf.id, r.p)
+		if actual != r.expected {
+			t.Errorf("Expected root(%v) to be %v, it was %v\n", r.p, r.expected, actual)
+		}
+	}
+}
+
+func TestUnionFind(t *testing.T) {
+	uf := NewQuickUnion(10)
+	setupUnionCalls(uf)
 	for _, r := range expectedConnectedResults {
 		actual := uf.Connected(r.p, r.q)
 		if actual != r.expected {
