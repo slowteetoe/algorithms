@@ -33,7 +33,7 @@ func (qf quickFind) Union(p, q int) {
 }
 
 func (qf quickFind) Connected(p, q int) bool {
-	return false
+	return qf.id[p] == qf.id[q]
 }
 
 func main() {

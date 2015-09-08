@@ -17,10 +17,16 @@ func prepareTest(uf UnionFinder) []int {
 	return []int{0, 1, 1, 8, 8, 0, 0, 1, 8, 8}
 }
 
-func TestOneStep(t *testing.T) {
-	uf := NewQuickFind(10)
-	uf.Union(0, 1)
-	assertEqual(t, uf.id, []int{1, 1, 2, 3, 4, 5, 6, 7, 8, 9})
+var expectedConnectedResults = []struct {
+	p, q     int
+	expected bool
+}{
+	{0, 1, false},
+	{0, 5, true},
+	{1, 6, false},
+	{6, 1, false},
+	{8, 9, true},
+	{4, 9, true},
 }
 
 func assertEqual(t *testing.T, actual, expected []int) {
@@ -31,8 +37,25 @@ func assertEqual(t *testing.T, actual, expected []int) {
 	}
 }
 
+func TestOneStep(t *testing.T) {
+	uf := NewQuickFind(10)
+	uf.Union(0, 1)
+	assertEqual(t, uf.id, []int{1, 1, 2, 3, 4, 5, 6, 7, 8, 9})
+}
+
 func TestQuickFind(t *testing.T) {
 	uf := NewQuickFind(10)
 	expected := prepareTest(uf)
 	assertEqual(t, uf.id, expected)
+}
+
+func TestQuickFindUsingTable(t *testing.T) {
+	uf := NewQuickFind(10)
+	prepareTest(uf)
+	for _, r := range expectedConnectedResults {
+		actual := uf.Connected(r.p, r.q)
+		if actual != r.expected {
+			t.Errorf("Expected Connected(%v, %v) to be %v, but was %v\n", r.p, r.q, r.expected, actual)
+		}
+	}
 }
