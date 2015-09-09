@@ -94,5 +94,5 @@ func TestWeightedUnionFind(t *testing.T) {
 			t.Errorf("Expected Connected(%v, %v) to be %v, but was %v\n", r.p, r.q, r.expected, actual)
 		}
 	}
-	// fmt.Printf("id:%v\nsz:%v\n", w.id, w.sz)
+	fmt.Printf("id:%v\nsz:%v\n", w.id, w.sz)
 }
