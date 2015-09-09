@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -66,7 +67,7 @@ func TestQuickUnionRootFunc(t *testing.T) {
 	uf.id = []int{2, 1, 2, 3}
 
 	for _, r := range rootResults {
-		actual := uf.root(uf.id, r.p)
+		actual := root(uf.id, r.p)
 		if actual != r.expected {
 			t.Errorf("Expected root(%v) to be %v, it was %v\n", r.p, r.expected, actual)
 		}
@@ -82,4 +83,16 @@ func TestUnionFind(t *testing.T) {
 			t.Errorf("Expected Connected(%v, %v) to be %v, but was %v\n", r.p, r.q, r.expected, actual)
 		}
 	}
+}
+
+func TestWeightedUnionFind(t *testing.T) {
+	w := NewWeightedQuickUnion(10)
+	setupUnionCalls(w)
+	for _, r := range expectedConnectedResults {
+		actual := w.Connected(r.p, r.q)
+		if actual != r.expected {
+			t.Errorf("Expected Connected(%v, %v) to be %v, but was %v\n", r.p, r.q, r.expected, actual)
+		}
+	}
+	// fmt.Printf("id:%v\nsz:%v\n", w.id, w.sz)
 }
