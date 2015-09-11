@@ -1,4 +1,4 @@
-package main
+package unionfind
 
 import ()
 
@@ -90,7 +90,7 @@ func (w weightedQuickUnion) Union(p, q int) {
 	qroot := root(w.id, q)
 	// only difference from non-weighted quick-union is that the smaller tree needs to be appended to the root of the larger tree
 	combined := w.sz[qroot] + w.sz[proot]
-	if w.count(proot) > w.count(qroot) {
+	if w.count(proot) < w.count(qroot) {
 		w.id[proot] = w.id[qroot]
 		w.sz[proot] = combined
 	} else {
