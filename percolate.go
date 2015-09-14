@@ -11,7 +11,8 @@ import (
 type grid struct {
 	n        int
 	uf       unionfind.UnionFind
-	cells    []int8
+	backwash unionfind.UnionFind
+	cells    []byte
 	top, bot int
 }
 
@@ -33,13 +34,20 @@ func (g *grid) IsOpen(p int) bool {
 	return g.cells[p] == 1
 }
 
-func (g *grid) IsClosed(p int) bool {
-	return g.cells[p] == 0
+func (g *grid) IsFull(p int) bool {
+	return g.backwash.Connected(g.top, p)
 }
 
 func (g *grid) Open(p int) {
 	g.cells[p] = 1
 	// check to see if any adjacent sites need to be joined
+
+	// see if we need to join to top virtual site
+	if p < g.n {
+		g.uf.Union(p, g.top)
+		g.backwash.Union(p, g.top)
+	}
+
 	if p-1 >= 0 && g.IsOpen(p-1) {
 		g.uf.Union(p, p-1)
 	}
@@ -52,6 +60,12 @@ func (g *grid) Open(p int) {
 	if p+g.n < g.n*g.n && g.IsOpen(p+g.n) {
 		g.uf.Union(p, p+g.n)
 	}
+
+	// see if we need to join to bot virtual site, backwash does not have a bot virtual site
+	if p > len(g.cells)-g.n {
+		g.uf.Union(p, g.bot)
+	}
+
 }
 
 func (g *grid) Percolates() bool {
@@ -61,14 +75,9 @@ func (g *grid) Percolates() bool {
 func NewGrid(initialSize int) grid {
 	numCells := initialSize * initialSize
 	// we have two "virtual sites" to reduce the number of connected() calls we need to make
-	grid := grid{n: initialSize, uf: unionfind.NewWeightedQuickUnion(numCells + 2), top: numCells, bot: numCells + 1}
-	grid.cells = make([]int8, numCells)
+	grid := grid{n: initialSize, uf: unionfind.NewWeightedQuickUnion(numCells + 2), backwash: unionfind.NewWeightedQuickUnion(numCells + 1), top: numCells, bot: numCells + 1}
+	grid.cells = make([]byte, numCells)
 
-	// initialize the top and bottom rows with links to both virtual sites
-	for i := 0; i < grid.n; i++ {
-		grid.uf.Union(i, grid.top)
-		grid.uf.Union((numCells-1)-i, grid.bot)
-	}
 	return grid
 }
 
@@ -88,8 +97,11 @@ func MonteCarlo(n int) (grid, int) {
 }
 
 func main() {
-	n := 800
-	_, i := MonteCarlo(n)
-	percentage := float64(i) / float64(n*n)
-	fmt.Printf("%vx%v grid percolated after %v cells were opened: %f\n", n, n, i, percentage)
+	for _, n := range []int{200, 400, 800, 1600, 3200} {
+		start := time.Now()
+		_, i := MonteCarlo(n)
+		elapsed := time.Since(start)
+		percentage := float64(i) / float64(n*n)
+		fmt.Printf("(%v) %vx%v grid percolated after %v cells were opened: %f\n", elapsed, n, n, i, percentage)
+	}
 }

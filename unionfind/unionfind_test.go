@@ -2,6 +2,7 @@ package unionfind
 
 import (
 	"fmt"
+	"math"
 	"testing"
 )
 
@@ -95,4 +96,19 @@ func TestWeightedUnionFind(t *testing.T) {
 		}
 	}
 	fmt.Printf("id:%v\nsz:%v\n", w.id, w.sz)
+}
+
+func TestTreeSizeWeightedQU(t *testing.T){
+	n := 8
+	w := NewWeightedQuickUnion(n)
+	for i := 1; i < n; i++ {
+		w.Union(i,0)
+	}
+	log2n := int(math.Log2(float64(n)))
+	for _, val := range w.sz {
+		if val > log2n {
+			t.Errorf("No depth should be greater than log2(%v), which is %v.  This one was: %v", n, log2n, val)
+		}
+	}
+	// fmt.Printf("%v", w.sz)
 }
