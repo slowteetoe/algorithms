@@ -7,4 +7,8 @@ Some random algorithms implemented in Go, from a Coursera class on Algorithms
 
 #### quick-find
 #### quick-union
-#### weighted quick-union with path compression
+#### weighted quick-union
+#### TODO: weighted quick-union with path compression
+
+## Search
+#### binary search (don't use this btw, just use <a href="http://golang.org/pkg/sort/#Search" target="_blank">sort.Search()</a> )
